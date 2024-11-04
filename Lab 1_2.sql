@@ -1,15 +1,5 @@
 --Organization Management
---Lab 1.1
-
-USE ROLE orgadmin;
-
-ALTER ACCOUNT MYORGACCOUNT SET IS_ORG_ADMIN = TRUE;
-
---Lab 1.2
-
-ALTER ACCOUNT MYORGACCOUNT SET IS_ORG_ADMIN = FALSE;
-
-
+--Review contact
 
 --Account Management
 --Lab 2.1
@@ -26,6 +16,15 @@ CREATE ACCOUNT DEMOSNOWSIGHT2
   EDITION = enterprise
   REGION = aws_us_west_2;
 
+--Lab 1.1
+
+USE ROLE orgadmin;
+
+ALTER ACCOUNT DEMOSNOWSIGHT2 SET IS_ORG_ADMIN = TRUE;
+
+--Lab 1.2
+
+ALTER ACCOUNT DEMOSNOWSIGHT2 SET IS_ORG_ADMIN = FALSE;
 
 --Create an open catalog Snowflake account
 CREATE ACCOUNT DEMOSNOWSIGHT3
