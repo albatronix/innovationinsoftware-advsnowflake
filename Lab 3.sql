@@ -12,9 +12,9 @@ ALTER ACCOUNT SET ENABLE_IDENTIFIER_FIRST_LOGIN = true;
 --To create an authentication policy
 
 CREATE AUTHENTICATION POLICY require_mfa_authentication_policy
-  AUTHENTICATION_METHODS = ('SAML', 'PASSWORD')
+  AUTHENTICATION_METHODS = ('PASSWORD')
   CLIENT_TYPES = ('SNOWFLAKE_UI', 'SNOWSQL', 'DRIVERS')
-  MFA_AUTHENTICATION_METHODS = ('PASSWORD', 'SAML')
+  MFA_AUTHENTICATION_METHODS = ('PASSWORD')
   MFA_ENROLLMENT = REQUIRED;
 
 --Apply to an account
@@ -25,7 +25,7 @@ ALTER USER test_user1 SET AUTHENTICATION POLICY require_mfa_authentication_polic
 
 --Ideally, you want a seperate policy for administrators to prevent lockout. This one SHOULD allow passwords as an authenitcation method
 CREATE AUTHENTICATION POLICY admin_authentication_policy
-  AUTHENTICATION_METHODS = ('SAML', 'PASSWORD')
+  AUTHENTICATION_METHODS = ('PASSWORD')
   CLIENT_TYPES = ('SNOWFLAKE_UI', 'SNOWSQL', 'DRIVERS');
 
 --Make sure you replace <administrator_name> with your admin user
