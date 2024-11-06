@@ -106,4 +106,100 @@ ALTER FAILOVER GROUP myfg REFRESH;
 
 GRANT FAILOVER ON FAILOVER GROUP myfg TO ROLE my_failover_role;
 
+
+-- Lab 10.2
+-- CDP
+
+--Let's get some data
+
+create database Citibike;
+
+
+create or replace table trips  
+(tripduration integer,
+  starttime timestamp,
+  stoptime timestamp,
+  start_station_id integer,
+  start_station_name string,
+  start_station_latitude float,
+  start_station_longitude float,
+  end_station_id integer,
+  end_station_name string,
+  end_station_latitude float,
+  end_station_longitude float,
+  bikeid integer,
+  membership_type string,
+  usertype string,
+  birth_year integer,
+  gender integer);
+
+
+use role accountadmin;
+
+use schema public;
+
+use database citibike;
+
+CREATE STAGE "CITIBIKE"."PUBLIC".citibike_trips URL = 's3://snowflake-workshop-lab/citibike-trips';
+
+list @CITIBIKE_TRIPS;
+
+show stages;
+
+CREATE OR REPLACE FILE FORMAT csv
+  TYPE = CSV
+  FIELD_DELIMITER = ','
+  FIELD_OPTIONALLY_ENCLOSED_BY = '"'
+  ERROR_ON_COLUMN_COUNT_MISMATCH = FALSE
+  EMPTY_FIELD_AS_NULL = TRUE
+  SKIP_HEADER = 1;
+  
+copy into trips from @citibike_trips
+file_format=CSV
+ON_ERROR=CONTINUE
+PATTERN='.*[.]csv.gz';
+
+--Let's try undrop
+
+drop table json_weather_data;
+
+Select * from json_weather_data limit 10;
+
+undrop table json_weather_data;
+
+
+
+--Let's try Time Travel
+
+use role sysadmin;
+use warehouse compute_wh;
+use database citibike;
+use schema public;
+
+update trips set start_station_name = 'oops';
+
+select 
+start_station_name as "station",
+count(*) as "rides"
+from trips
+group by 1
+order by 2 desc
+limit 20;
+
+set query_id = 
+(select query_id from 
+table(information_schema.query_history_by_session (result_limit=>5)) 
+where query_text like 'update%' order by start_time limit 1);
+
+create or replace table trips as
+(select * from trips before (statement => $query_id));
+        
+select 
+start_station_name as "station",
+count(*) as "rides"
+from trips
+group by 1
+order by 2 desc
+limit 20;
+
   
